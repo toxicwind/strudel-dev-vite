@@ -1,0 +1,38 @@
+name: Docker Build (Local)
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-buildx-action@v3
+      - name: Version
+        id: ver
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "TAG=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "TAG=latest" >> $GITHUB_OUTPUT
+          fi
+      - uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: false
+          load: true
+          tags: strudel-sampler:${{ steps.ver.outputs.TAG }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test
+        run: docker run --rm strudel-sampler:${{ steps.ver.outputs.TAG }} node -v

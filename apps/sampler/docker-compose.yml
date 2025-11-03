@@ -1,0 +1,26 @@
+services:
+  strudel-sampler:
+    container_name: strudel-sampler
+    environment:
+      CACHE_MAX_SIZE: '500'
+      CACHE_TTL: '3600000'
+      HOT_RELOAD: 'true'
+      PORT: '5432'
+      STRUDEL_SAMPLES: /samples
+    healthcheck:
+      interval: 30s
+      retries: 3
+      start_period: 20s
+      test:
+      - CMD
+      - curl
+      - -f
+      - http://localhost:5432/stats
+      timeout: 10s
+    image: strudel-sampler:latest
+    ports:
+    - 5432:5432
+    restart: unless-stopped
+    volumes:
+    - ${STRUDEL_SAMPLES}:/samples:ro
+version: '3.8'

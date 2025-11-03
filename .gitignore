@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+packages/*/dist/
+apps/*/dist/
+
+# Playwright artifacts
+playwright-report/
+test-results/
+
+# Local env
+.env
+.env.*
+
+# Sample libraries
+samples/
+apps/sampler/samples/
+
+# Logs and caches
+*.log
+*.log.*
+.cache/
+
+# OS junk
+.DS_Store
+Thumbs.db

@@ -1,0 +1,34 @@
+{
+  "name": "strudel-dev-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "vite --config apps/dev/vite.config.mjs --host",
+    "build": "npm run build:plugins && vite build --config apps/dev/vite.config.mjs",
+    "build:plugins": "vite build --config packages/plugins/vite.config.mjs",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist node_modules packages/*/dist",
+    "test": "npm run test:e2e",
+    "test:e2e": "playwright test",
+    "sampler": "npm run sampler --workspace strudel-sampler-microservice",
+    "sampler:dev": "npm run dev --workspace strudel-sampler-microservice",
+    "sampler:build": "npm run build --workspace strudel-sampler-microservice"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1",
+    "@types/node": "^24.10.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8",
+    "vite-plugin-dts": "^4.0.2"
+  },
+  "dependencies": {
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}
