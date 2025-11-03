@@ -8,7 +8,7 @@ Modern Vite workspace for Strudel live-coding experiments. It bundles three pill
 
 - **apps/dev** – browser shell that loads Strudel plugins and the Serum bridge for rapid experimentation.
 - **packages/plugins** – reusable Strudel-ready utilities (Serum helpers, filter builders, etc.).
-- **apps/sampler** – production-ready sampler microservice + Vite middleware, relocated from `sampler-test` and tuned for this repo.
+- **apps/sampler** – production-ready sampler microservice + Vite middleware (checked out via git submodule).
 
 ## Quick start
 
@@ -52,7 +52,7 @@ npm run test
 
 ## Sampler microservice
 
-The sampler service relocated from `/home/toxic/Downloads/sampler-test` and keeps its production settings:
+The sampler service lives in the companion repo [`strudel-sampler-server-vite`](https://github.com/toxicwind/strudel-sampler-server-vite) and is vendored here as a git submodule. It keeps its production settings:
 
 - Config via `.env` or environment variables (`PORT`, `STRUDEL_SAMPLES`, `CACHE_TTL`, `CACHE_MAX_SIZE`, `HOT_RELOAD`).
 - Docker + Portainer deployment artifacts live in `apps/sampler/`.
