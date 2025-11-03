@@ -13,8 +13,11 @@ Modern Vite workspace for Strudel live-coding experiments. It bundles three pill
 ## Quick start
 
 ```bash
+git clone --recurse-submodules git@github.com:toxicwind/strudel-dev-vite.git
+cd strudel-dev-vite
 npm install
-npm run dev          # launches the dev UI on http://localhost:8088
+cp .env.example .env            # optional: customise bridge URLs
+npm run dev                     # launches the dev UI on http://localhost:8088
 ```
 
 Optional local sampler (serves audio metadata + dashboard):
@@ -24,7 +27,9 @@ Optional local sampler (serves audio metadata + dashboard):
 PORT=5432 npm run sampler     # uses apps/sampler via tsx
 ```
 
-The sampler looks for audio files under `./samples/` by default (ignored by git). Copy your library there or point `STRUDEL_SAMPLES` elsewhere.
+The sampler looks for audio files under `./samples/` by default (ignored by git). Copy your library there or set `STRUDEL_SAMPLES` in `.env` or the shell environment.
+
+> ℹ️ If you cloned without submodules, run `git submodule update --init --recursive` once to fetch `apps/sampler`.
 
 ## Scripts
 
@@ -77,8 +82,16 @@ tests/e2e/    # Playwright smoke coverage
 samples/      # (ignored) drop your audio library here
 ```
 
+## Environment
+
+- Copy `.env.example` to `.env` to override defaults. Available settings:
+  - `VITE_SERUM_BRIDGE_URL` – websocket used by the dev UI (defaults to `ws://localhost:9000`).
+  - `STRUDEL_SAMPLER_URL` – optional helper for pointing scripts/tests at a remote sampler endpoint.
+- Sampler-specific variables live in the submodule (`apps/sampler/.env.example`) and include `STRUDEL_SAMPLES`, `PORT`, `CACHE_TTL`, and `CACHE_MAX_SIZE`.
+
 ## Notes
 
-- `.gitignore` protects `samples/`, local env files, Playwright output, and build artifacts.
+- `.gitignore` protects `samples/`, local env files (but keeps the `*.example` templates), Playwright output, and build artifacts.
 - `apps/dev` exposes plugin metadata on `window.__serumPlugins` for diagnostics and testing.
 - Serum bridge initialisation now degrades gracefully when no WebSocket server is available.
+- Sampler source is provided by [`strudel-sampler-server-vite`](https://github.com/toxicwind/strudel-sampler-server-vite) via git submodule; keep it in sync with `git submodule update --remote --merge` when you need upstream changes.

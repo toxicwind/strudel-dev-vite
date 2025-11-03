@@ -13,6 +13,7 @@ test-results/
 # Local env
 .env
 .env.*
+!.env.example
 
 # Sample libraries
 samples/
