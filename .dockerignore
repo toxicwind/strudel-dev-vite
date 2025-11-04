@@ -1,0 +1,17 @@
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+playwright-report
+test-results
+dist
+packages/*/dist
+apps/*/dist
+samples/*
+apps/sampler/samples/*
+.git
+.gitmodules
+.github
+.env
+.env.*
+.DS_Store

@@ -15,6 +15,7 @@
     "clean": "rm -rf dist node_modules packages/*/dist",
     "test": "npm run test:e2e",
     "test:e2e": "playwright test",
+    "preview": "vite preview --config apps/dev/vite.config.mjs --host",
     "sampler": "npm run sampler --workspace strudel-sampler-microservice",
     "sampler:dev": "npm run dev --workspace strudel-sampler-microservice",
     "sampler:build": "npm run build --workspace strudel-sampler-microservice"

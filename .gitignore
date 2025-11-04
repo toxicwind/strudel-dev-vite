@@ -16,8 +16,9 @@ test-results/
 !.env.example
 
 # Sample libraries
-samples/
-apps/sampler/samples/
+samples/*
+!samples/.gitkeep
+apps/sampler/samples/*
 
 # Logs and caches
 *.log

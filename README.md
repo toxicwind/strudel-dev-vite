@@ -31,6 +31,8 @@ The sampler looks for audio files under `./samples/` by default (ignored by git)
 
 > ℹ️ If you cloned without submodules, run `git submodule update --init --recursive` once to fetch `apps/sampler`.
 
+The repository ships with an empty `samples/.gitkeep` placeholder so the directory exists locally while staying out of version control. Drop your actual libraries alongside it or point `STRUDEL_SAMPLES` to another location.
+
 ## Scripts
 
 | Command | Description |
@@ -88,6 +90,40 @@ samples/      # (ignored) drop your audio library here
   - `VITE_SERUM_BRIDGE_URL` – websocket used by the dev UI (defaults to `ws://localhost:9000`).
   - `STRUDEL_SAMPLER_URL` – optional helper for pointing scripts/tests at a remote sampler endpoint.
 - Sampler-specific variables live in the submodule (`apps/sampler/.env.example`) and include `STRUDEL_SAMPLES`, `PORT`, `CACHE_TTL`, and `CACHE_MAX_SIZE`.
+
+## Sample library tips
+
+- Follow Strudel's folder conventions so subdirectories become available as sample names (for example `samples/drums/bd`, `samples/drums/sd`, `samples/fx/risers`). This lets you call them with the usual shorthand such as `s("bd sd")` or `samples('http://localhost:5432/').`  
+- Group drum kits and sound families together for predictable `bank` switching (e.g. `samples/drums/roland-tr-909/bd/*.wav`) and park multi-sampled instruments under a single prefix like `samples/keys/wurlitzer/`.  
+- Run the sampler dashboard (`http://localhost:5432/dashboard/`) after adding new files to confirm metadata, categories, and waveform previews before a session.
+
+## Continuous Integration
+
+GitHub Actions (`.github/workflows/ci.yml`) runs on every push and pull request:
+
+1. Checks out submodules.
+2. Executes `npm ci` and installs Playwright browsers.
+3. Runs `npm run build`, `npm run test:e2e`, and `npm run sampler:build`.
+4. Builds the Docker image to make sure the container workflow stays healthy.
+
+When the workflow is green, the dev UI, plugin bundle, sampler microservice, and Docker image have all built successfully from the committed lockfile.
+
+## Docker
+
+Use the included multi-stage `Dockerfile` to compile and serve the workspace via `vite preview`:
+
+```bash
+docker build -t strudel-dev-vite .
+docker run --rm -p 8088:8088 strudel-dev-vite
+```
+
+Supply environment overrides with `--env-file` (or `-e`) when you need a non-default bridge URL:
+
+```bash
+docker run --rm -p 8088:8088 --env-file .env strudel-dev-vite
+```
+
+For sampler containers, work directly inside [`strudel-sampler-server-vite`](https://github.com/toxicwind/strudel-sampler-server-vite) or mount the submodule into your runtime image.
 
 ## Notes
 
