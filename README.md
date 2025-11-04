@@ -88,7 +88,7 @@ samples/      # (ignored) drop your audio library here
 
 - Copy `.env.example` to `.env` to override defaults. Available settings:
   - `VITE_SERUM_BRIDGE_URL` – websocket used by the dev UI (defaults to `ws://localhost:9000`).
-  - `STRUDEL_SAMPLER_URL` – optional helper for pointing scripts/tests at a remote sampler endpoint.
+- `VITE_SAMPLER_BASE_URL` – base URL for the sampler microservice (defaults to `http://localhost:5432`).
 - Sampler-specific variables live in the submodule (`apps/sampler/.env.example`) and include `STRUDEL_SAMPLES`, `PORT`, `CACHE_TTL`, and `CACHE_MAX_SIZE`.
 
 ## Sample library tips

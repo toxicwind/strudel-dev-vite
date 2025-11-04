@@ -1,9 +1,11 @@
 import { initSerumBridge } from '@custom/plugins'
 
-const bridgeUrl =
-  // Vite exposes environment variables prefixed with VITE_
-  (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_SERUM_BRIDGE_URL ??
-  'ws://localhost:9000'
+type ImportMetaEnv = { env?: Record<string, string | undefined> }
 
-initSerumBridge(bridgeUrl)
-console.log('Bridge initialized')
+export function startSerumBridge() {
+  const bridgeUrl =
+    (import.meta as unknown as ImportMetaEnv).env?.VITE_SERUM_BRIDGE_URL ?? 'ws://localhost:9000'
+  const bridge = initSerumBridge(bridgeUrl)
+  console.log('[Serum] Bridge bootstrap attempted:', bridgeUrl)
+  return { bridge, bridgeUrl }
+}
