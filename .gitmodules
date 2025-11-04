@@ -1,3 +1,6 @@
 [submodule "apps/sampler"]
 	path = apps/sampler
 	url = git@github.com:toxicwind/strudel-sampler-server-vite.git
+[submodule "vendor/strudel"]
+	path = vendor/strudel
+	url = https://codeberg.org/uzu/strudel.git
