@@ -1,0 +1,10 @@
+total 4608
+drwxr-xr-x 1 toxic toxic      46 Nov  4 16:09 assets
+-rw-r--r-- 1 toxic toxic    1059 Nov  4 16:09 hydra-BfVrg0kI.js
+-rw-r--r-- 1 toxic toxic  324593 Nov  4 16:09 index-B60C3fME.js
+-rw-r--r-- 1 toxic toxic     589 Nov  4 16:09 index-BC1TJfW7.js
+-rw-r--r-- 1 toxic toxic 2179427 Nov  4 16:09 index-C7dSFg4w.js
+-rw-r--r-- 1 toxic toxic  184647 Nov  4 16:09 index-D9lYVLxj.js
+-rw-r--r-- 1 toxic toxic 1994783 Nov  4 16:09 index.js
+-rw-r--r-- 1 toxic toxic      74 Nov  4 16:09 index.mjs
+-rw-r--r-- 1 toxic toxic    4401 Nov  4 16:09 index-NKxIQG8J.js

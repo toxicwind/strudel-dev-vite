@@ -1,91 +1,42 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('Strudel dev UI', () => {
-  test('exposes plugins without depending on Serum bridge connectivity', async ({ page }) => {
-    const [pluginLog] = await Promise.all([
-      page.waitForEvent('console', {
-        predicate: (msg) => msg.type() === 'log' && msg.text().startsWith('Serum plugins loaded')
-      }),
-      page.goto('/')
-    ])
+test.describe('Strudel REPL smoke', () => {
+  test('loads the web component and serves vendor assets', async ({ page, request }) => {
+    await page.goto('/')
 
-    expect(pluginLog.text()).toContain('serum')
+    await page.waitForFunction(() => typeof window !== 'undefined' && typeof window.customElements?.get === 'function')
+    await page.waitForFunction(() => Boolean(window.customElements?.get('strudel-editor')))
 
-    const state = await page.evaluate(() => {
-      const globalThisAny = globalThis as any
-      const { __serumPluginKeys, __serumPlugins } = globalThisAny
-      const steps: string[] = []
-      const messages: string[] = []
-      if (__serumPlugins?.serum) {
-        const stubBridge = {
-          readyState: globalThisAny.WebSocket?.OPEN ?? 1,
-          sent: messages,
-          send(payload: string) {
-            this.sent.push(payload)
-          }
-        }
-        globalThisAny.serumBridge = stubBridge
+    const vendorLoaded = await page.evaluate(() =>
+      performance
+        .getEntriesByType('resource')
+        .some((entry) => entry.name.includes('/vendor/strudel/repl/index.js')),
+    )
+    expect(vendorLoaded).toBe(true)
 
-        const pattern: any = {
-          s(value: unknown) {
-            steps.push(`s:${String(value)}`)
-            return this
-          },
-          lpf(value: unknown) {
-            steps.push(`lpf:${String(value)}`)
-            return this
-          },
-          attack(value: unknown) {
-            steps.push(`attack:${String(value)}`)
-            return this
-          },
-          release(value: unknown) {
-            steps.push(`release:${String(value)}`)
-            return this
-          },
-          gain(value: unknown) {
-            steps.push(`gain:${String(value)}`)
-            return this
-          },
-          onTrigger(fn: (payload: any) => void) {
-            steps.push('onTrigger')
-            fn({ value: 64 })
-            return this
-          },
-          mult(value: unknown) {
-            steps.push(`mult:${String(value)}`)
-            return this
-          },
-          add(value: unknown) {
-            steps.push(`add:${String(value)}`)
-            return this
-          },
-          reso(value: unknown) {
-            steps.push(`reso:${String(value)}`)
-            return this
-          }
-        }
-        __serumPlugins.serum('bass-pluck')(pattern)
-      }
-      return {
-        pluginKeys: __serumPluginKeys,
-        hasSerum: Boolean(__serumPlugins?.serum),
-        steps,
-        messages
-      }
+    const docResponse = await request.get('/vendor/strudel/doc.json')
+    expect(docResponse.ok()).toBeTruthy()
+
+    const replHandle = await page.waitForSelector('strudel-editor', { state: 'attached' })
+    await page.waitForFunction(
+      (el) => typeof (el as any).editor?.evaluate === 'function',
+      replHandle,
+      { timeout: 30_000 },
+    )
+
+    const played = await page.evaluate(async () => {
+      const repl = document.querySelector('strudel-editor') as any
+      if (!repl?.editor) return false
+      await repl.editor.evaluate('note("c4")')
+      await new Promise((resolve) => setTimeout(resolve, 50))
+      repl.editor.hush?.()
+      return typeof repl.editor.evaluate === 'function'
     })
+    expect(played).toBe(true)
 
-    expect(state.pluginKeys).toContain('serum')
-    expect(state.hasSerum).toBe(true)
-    expect(state.steps).toEqual([
-      's:triangle',
-      'lpf:800',
-      'attack:0.001',
-      'release:0.1',
-      'gain:0.7',
-      'onTrigger'
-    ])
-    expect(state.messages).toHaveLength(1)
-    expect(JSON.parse(state.messages[0])).toMatchObject({ voice: 'bass-pluck', type: 'noteOn' })
+    const uiHost = await page.waitForSelector('strudel-editor + div', { state: 'visible' })
+    const bbox = await uiHost.boundingBox()
+    expect(bbox?.height ?? 0).toBeGreaterThan(200)
+    expect(bbox?.width ?? 0).toBeGreaterThan(400)
   })
 })

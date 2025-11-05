@@ -1,0 +1,7 @@
+Test timeout of 60000ms exceeded while running "beforeEach" hook.
+
+  at tests/e2e/strudel.spec.ts:15:8
+
+Error: page.waitForSelector: Test timeout of 60000ms exceeded.
+Call log:
+  - waiting for locator('#code')

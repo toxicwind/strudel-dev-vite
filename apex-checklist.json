@@ -1,0 +1,93 @@
+[
+  {
+    "task": "Checkpoint-1",
+    "description": "Removed Tailwind/PostCSS/DaisyUI configs, dependencies, and vendored sources. Verified no references remain in project code.",
+    "evidence": [
+      "rm -rf vendor",
+      "rm tailwind.config.js postcss.config.js",
+      "npm install",
+      "rg 'tailwind|postcss|daisyui' --glob '!node_modules/*'"
+    ],
+    "status": "done",
+    "timestamp": "2025-11-04T19:02:37.772Z"
+  },
+  {
+    "task": "Checkpoint-5",
+    "description": "Astro layout + index page mount <strudel-editor> directly; vendored script loads without React shell.",
+    "evidence": [
+      "src/layouts/ReplLayout.astro",
+      "src/pages/index.astro",
+      "dist/index.html"
+    ],
+    "status": "done",
+    "timestamp": "2025-11-04T23:28:13Z"
+  },
+  {
+    "task": "Checkpoint-6",
+    "description": "Removed residual React/Vite dependencies and ensured package.json only contains Astro + tooling.",
+    "evidence": [
+      "package.json",
+      "ops/evidence/no-tailwind-scan.txt"
+    ],
+    "status": "done",
+    "timestamp": "2025-11-04T23:28:13Z"
+  },
+  {
+    "task": "Checkpoint-7",
+    "description": "Configured Playwright webServer to run astro preview with strict port + timeout bump.",
+    "evidence": [
+      "playwright.config.ts"
+    ],
+    "status": "done",
+    "timestamp": "2025-11-04T23:28:13Z"
+  },
+  {
+    "task": "Checkpoint-8",
+    "description": "Replaced legacy specs with REPL smoke that asserts vendor asset load and editor API.",
+    "evidence": [
+      "tests/e2e/strudel.spec.ts",
+      "ops/evidence/playwright-smoke.log"
+    ],
+    "status": "done",
+    "timestamp": "2025-11-04T23:28:13Z"
+  },
+  {
+    "task": "Checkpoint-9",
+    "description": "Verified vendored assets hoist through public/; preview serves /vendor/strudel/* unchanged.",
+    "evidence": [
+      "public/vendor/strudel/repl/index.js",
+      "ops/evidence/vendor-strudel-sizes.txt"
+    ],
+    "status": "done",
+    "timestamp": "2025-11-04T23:28:13Z"
+  },
+  {
+    "task": "Checkpoint-10",
+    "description": "Updated README with Astro-only guidance and pinned asset provenance.",
+    "evidence": [
+      "README.md",
+      "ops/pins/strudel-repl.json"
+    ],
+    "status": "done",
+    "timestamp": "2025-11-04T23:28:13Z"
+  },
+  {
+    "task": "Checkpoint-11",
+    "description": "Simplified npm scripts to Astro lifecycle + e2e smoke; removed legacy Toolchain commands.",
+    "evidence": [
+      "package.json"
+    ],
+    "status": "done",
+    "timestamp": "2025-11-04T23:28:13Z"
+  },
+  {
+    "task": "Checkpoint-12",
+    "description": "Closed migration ledger with decisions + evidence; all CP tasks marked done.",
+    "evidence": [
+      "ops/checklist.migration.json",
+      "apex-checklist.json"
+    ],
+    "status": "done",
+    "timestamp": "2025-11-04T23:28:35Z"
+  }
+]

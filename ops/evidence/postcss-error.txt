@@ -1,0 +1,5 @@
+[Vite Dev Server] Failed to load PostCSS config: Failed to load PostCSS config (searchPath: /home/toxic/strudel-dev): [Error] Loading PostCSS Plugin failed: Cannot find module '@tailwindcss/postcss'
+Require stack:
+- /home/toxic/strudel-dev/postcss.config.js
+
+(@/home/toxic/strudel-dev/postcss.config.js)

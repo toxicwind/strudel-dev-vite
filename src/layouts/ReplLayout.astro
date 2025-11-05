@@ -1,0 +1,49 @@
+---
+interface Props {
+  title?: string;
+}
+
+const { title = 'Strudel REPL' } = Astro.props;
+---
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content="Local Strudel editor powered by the Strudel REPL web component." />
+    <style>
+      :root {
+        color-scheme: dark;
+      }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        min-height: 100vh;
+        background: #05070f;
+        color: #f5f6fb;
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      }
+      main {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      strudel-editor {
+        flex: 1;
+        display: block;
+        min-height: 0;
+      }
+      ::selection {
+        background: rgba(80, 140, 255, 0.45);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <slot />
+    </main>
+    <script defer src="/vendor/strudel/repl/index.js"></script>
+  </body>
+</html>

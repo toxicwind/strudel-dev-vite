@@ -1,0 +1,3 @@
+npm error code E404
+npm error 404 Not Found - GET https://registry.npmjs.org/supradough - Not found
+npm error 404  'supradough@1.2.4' is not in this registry.

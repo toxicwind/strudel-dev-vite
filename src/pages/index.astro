@@ -1,0 +1,18 @@
+---
+import ReplLayout from '../layouts/ReplLayout.astro';
+---
+<ReplLayout title="Strudel REPL">
+  <strudel-editor code={`setcps(1)
+stack(
+  n("<0 3 7 10>*8").scale('C4 minor')
+    .s("gm_electric_piano_1")
+    .struct("x[xx]x[xx]"),
+  s("bd(3,8), sd")
+    .gain(0.8)
+    .hpf(400).hpq(3),
+  note("0 2 5").s("gm_shamisen")
+    .delay("0.25:0.5:0.5")
+    .lpf(sine.range(500, 2000).slow(16))
+)
+`}></strudel-editor>
+</ReplLayout>

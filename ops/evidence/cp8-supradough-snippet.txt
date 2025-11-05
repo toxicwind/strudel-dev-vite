@@ -1,0 +1,51 @@
+  );
+  return ht.stop = (De) => {
+    ee.stop(De);
+  }, ht;
+}
+let ll;
+function eR() {
+  const t = ct();
+  ll = hr(
+    t,
+    "dough-processor",
+    {},
+    {
+      outputChannelCount: [2]
+    }
+  ), AS(ll);
+}
+const ru = /* @__PURE__ */ new Map(), V1 = /* @__PURE__ */ new Map();
+fe.prototype.supradough = function() {
+  return this.onTrigger((t, e, n, r) => {
+    t.value._begin = r, t.value._duration = t.duration / n, !ll && eR();
+    const i = (t.value.bank ? t.value.bank + "_" : "") + t.value.s, s = t.value.n ?? 0, o = `${i}:${s}`;
+    if (ru.has(i) && (t.value.s = o), ru.has(i) && !V1.has(o)) {
+      const a = ru.get(i), l = a[s % a.length];
+      console.log(`load ${o} from ${l}`);
+      const c = rR(l);
+      V1.set(o, c), c.then(
+        ({ channels: h, sampleRate: p }) => ll.port.postMessage({
+          sample: o,
+          channels: h,
+          sampleRate: p
+        })
+      );
+    }
+    ll.port.postMessage({ spawn: t.value });
+  }, 1);
+};
+function tR(t, e = "") {
+  if (!t.startsWith("github:"))
+    throw new Error('expected "github:" at the start of pseudoUrl');
+  let [n, r] = t.split("github:");
+  return r = r.endsWith("/") ? r.slice(0, -1) : r, r.split("/").length === 2 && (r += "/main"), `https://raw.githubusercontent.com/${r}/${e}`;
+}
+async function nR(t) {
+  if (t.startsWith("github:") && (t = tR(t, "strudel.json")), t.startsWith("local:") && (t = "http://localhost:5432"), t.startsWith("shabda:")) {
+    let [r, i] = t.split("shabda:");
+    t = `https://shabda.ndre.gr/${i}.json?strudel=1`;
+  }
+  if (t.startsWith("shabda/speech")) {
+    let [r, i] = t.split("shabda/speech");
+    i = i.startsWith("/") ? i.substring(1) : i;

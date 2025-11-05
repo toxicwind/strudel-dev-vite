@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test'
 
-const PORT = 8088
+const PORT = 4173
 const HOST = '127.0.0.1'
 
 export default defineConfig({
@@ -17,10 +17,10 @@ export default defineConfig({
     video: 'retain-on-failure'
   },
   webServer: {
-    command: 'npm run dev -- --strictPort',
+    command: `npm run preview -- --host ${HOST} --port ${PORT}`,
     url: `http://${HOST}:${PORT}`,
     reuseExistingServer: !process.env.CI,
-    timeout: 90_000,
+    timeout: 150_000,
     stdout: 'pipe',
     stderr: 'pipe'
   }

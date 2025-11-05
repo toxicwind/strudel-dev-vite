@@ -1,0 +1,5 @@
+COMMAND       PID  USER   FD   TYPE    DEVICE SIZE/OFF NODE NAME
+kdeconnec   11149 toxic   40u  IPv6 150242064      0t0  TCP *:xmsg (LISTEN)
+Discord     17633 toxic   59u  IPv4    202823      0t0  TCP localhost:6463 (LISTEN)
+http-serv 2819340 toxic   21u  IPv4 109981070      0t0  TCP *:pcsync-https (LISTEN)
+http-serv 2980339 toxic   21u  IPv4 111973280      0t0  TCP *:8089 (LISTEN)

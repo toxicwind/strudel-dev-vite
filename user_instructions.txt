@@ -1,0 +1,62 @@
+# APEX Artifact — **Strudel-Only Frontend** (Astro-orchestrated) ― **Autonomous Conversion Plan**
+
+**You are operating from the state you reported:** the vendor Strudel React REPL was embedded inside a Vite app; Tailwind/PostCSS/DaisyUI were copied from the vendor’s Astro, dev fails with the Tailwind v4/PostCSS plugin error, and Playwright timeouts block progress. From now on you will **remove Tailwind/PostCSS/DaisyUI and the Vite-UI shell entirely**, adopt **Astro as the single build/run orchestrator**, and deliver the **vendor Strudel frontend + REPL** as the only UI. Strudel development has moved to **Codeberg**; the supported embed is the **`@strudel/repl` web component**. Use Astro’s **`public/`** for static vendor assets and serve E2E via **`astro build` → `astro preview`** with Playwright’s `webServer`. Do not ask for permission, do not pause for confirmation, and do not branch into alternatives. Proceed linearly until all acceptance checks are satisfied. ([GitHub][1])
+
+## Autonomous Taskflow (single path; >8 tasks; each task commits a **checkpoint** and continues)
+
+1. **Purge conflicting toolchain** — Quarantine and then **remove** all Tailwind/PostCSS/DaisyUI/Vite-UI wiring (configs, plugins, CSS `@tailwind` usage, DaisyUI plugin refs, CSS imports that trigger PostCSS). This eliminates the Tailwind v4 PostCSS-plugin crash surface instead of “fixing” it.
+   **Checkpoint-1:** repo has **no** PostCSS/Tailwind/DaisyUI config or imports; a repo-wide scan returns zero matches for `tailwind`, `postcss`, `daisyui`. Evidence logged to `apex-checklist.json`. ([GitHub][2])
+
+2. **Promote Astro to sole orchestrator** — Establish an Astro root and config; all web serving, dev, and build go through Astro. **Do not** boot Vite directly.
+   **Checkpoint-2:** `astro dev` runs; `astro build` succeeds; previous `vite dev` scripts are removed or disabled. ([docs.astro.build][3])
+
+3. **Vendor asset pipeline** — **Pin** and stage vendor bundles statically. Place `@strudel/repl` (exact version pinned from npm) and any vendor CSS/JS in `public/vendor/` (or configure a single **static-copy** rule in `astro.config.*` to hoist from an external folder into `dist/`).
+   **Checkpoint-3:** assets are resolvable at `/vendor/*` in both dev and preview builds; the copy step is recorded in `apex-checklist.json`. ([npm][4])
+
+4. **Base layout** — Create one Astro layout that links the vendor CSS and the REPL script using Astro’s documented external-script/public asset pattern (no bundling, served as-is).
+   **Checkpoint-4:** home route renders the layout; network shows vendor CSS/JS loads without transformation. ([docs.astro.build][5])
+
+5. **REPL mount (web component, not React)** — On `/`, render `<strudel-editor>` **directly in a `.astro` page**. Do not wrap it in React; Strudel provides a standalone custom element.
+   **Checkpoint-5:** in the running page console, `customElements.get('strudel-editor')` is defined and the editor renders. ([npm][4])
+
+6. **Remove the React shell** — Delete the Vite/React wrapper you previously used to embed the REPL (e.g., `apps/dev/src/App.tsx` path). The UI surface is now **only** the vendor Strudel REPL in Astro.
+   **Checkpoint-6:** no React/CRA-style mount is referenced by routes; app boot does not depend on React integrations. (If later you decide to add React islands, that is a separate, explicit migration; **not** part of this path.) ([docs.astro.build][6])
+
+7. **Single server for tests** — Configure Playwright to launch **`astro preview` on a fixed port**; run smoke specs against the built site for deterministic startup.
+   **Checkpoint-7:** Playwright `webServer` points at `npm run preview` / fixed URL; preview starts reliably; timeouts disappear. ([docs.astro.build][7])
+
+8. **REPL smoke spec** — Author one e2e test that asserts: 200 on `/`; vendor assets loaded; `<strudel-editor>` present; minimal pattern executes (DOM/state assertion).
+   **Checkpoint-8:** spec is green on CI and locally; failures emit HAR and console logs stored under `tests/artifacts/`. ([strudel.cc][8])
+
+9. **Vendor-source hoisting** — If vendor artifacts live outside the repo, **hoist at build** using a single `vite-plugin-static-copy` rule (kept in `astro.config.*`).
+   **Checkpoint-9:** cold clone + `install` + `build` produces a working `dist/` with vendor files in place; no manual copying required. ([npm][9])
+
+10. **Docs reality-map** — Replace prior README guidance: Astro is the orchestrator; vendor Strudel REPL is the UI; no Tailwind/PostCSS/DaisyUI remain. Include a concise “why” with links to current upstream docs and the Codeberg move.
+    **Checkpoint-10:** README delta committed; links verified. ([GitHub][1])
+
+11. **Repository hygiene** — Remove dead configs and scripts (Tailwind, PostCSS, DaisyUI, Vite dev). Ensure a single `dev`, `build`, `preview`, and `test:e2e` script.
+    **Checkpoint-11:** `npm run` lists only Astro/Playwright lifecycle; CI matrix updated accordingly. ([docs.astro.build][3])
+
+12. **Telemetry & auditability** — Maintain `apex-checklist.json` (array of items: file, action, reason, status, timestamp). After each mutation, append an entry and continue execution. No prompts to user; no pauses.
+    **Checkpoint-12 (final):** checklist shows all tasks `status:"done"` with evidence pointers (commit SHAs, log snapshots, test reports).
+
+### Final Acceptance (evidence, not opinion)
+
+* `astro build` completes without PostCSS/Tailwind errors (because they are removed).
+* `astro preview` serves `/` with vendor CSS/JS resolved from `public/` (or hoisted) per Astro docs.
+* `<strudel-editor>` is registered and interactive (custom element present).
+* Playwright smoke spec passes on CI and local.
+* `apex-checklist.json` records every change. ([docs.astro.build][10])
+
+**Operating rule:** You are fully autonomous. **Do not** ask for permission, confirmation, or preferences. If any step fails, immediately self-diagnose using logs and continue until the above acceptance conditions are met.
+
+[1]: https://github.com/tidalcycles/strudel?utm_source=chatgpt.com "tidalcycles/strudel: MOVED TO CODEBERG"
+[2]: https://github.com/tailwindlabs/tailwindcss/issues/15735?utm_source=chatgpt.com "[v4] It looks like you're trying to use tailwindcss directly as a ..."
+[3]: https://docs.astro.build/en/develop-and-build/?utm_source=chatgpt.com "Develop and build - Astro Docs"
+[4]: https://npmjs.com/package/%40strudel/repl?ref=pkgstats.com&utm_source=chatgpt.com "strudel/repl"
+[5]: https://docs.astro.build/en/guides/client-side-scripts/?utm_source=chatgpt.com "Scripts and event handling - Astro Docs"
+[6]: https://docs.astro.build/en/guides/framework-components/?utm_source=chatgpt.com "Front-end frameworks - Astro Docs"
+[7]: https://docs.astro.build/en/guides/testing/?utm_source=chatgpt.com "Testing - Astro Docs"
+[8]: https://strudel.cc/?utm_source=chatgpt.com "Strudel REPL"
+[9]: https://www.npmjs.com/package/vite-plugin-static-copy?utm_source=chatgpt.com "vite-plugin-static-copy"
+[10]: https://docs.astro.build/en/basics/project-structure/?utm_source=chatgpt.com "Project structure - Astro Docs"

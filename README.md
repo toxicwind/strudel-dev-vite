@@ -1,133 +1,85 @@
-# strudel-dev-vite
+# Strudel Dev — Astro + Vendored REPL
 
-[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Playwright](https://img.shields.io/badge/Tests-Playwright-45ba68?logo=microsoft-playwright&logoColor=white)](https://playwright.dev/)
-[![Vite](https://img.shields.io/badge/Bundler-Vite-646cff?logo=vite&logoColor=white)](https://vitejs.dev/)
-
-Modern Vite workspace for Strudel live-coding experiments. It bundles three pillars:
-
-- **apps/dev** – browser shell that loads Strudel plugins and the Serum bridge for rapid experimentation.
-- **packages/plugins** – reusable Strudel-ready utilities (Serum helpers, filter builders, etc.).
-- **apps/sampler** – production-ready sampler microservice + Vite middleware (checked out via git submodule).
+This workspace serves the upstream [Strudel](https://strudel.cc) REPL as the only UI surface. Astro is the sole build/dev/preview orchestrator, and the Strudel web component (`<strudel-editor>`) is vendored from the Codeberg monorepo and delivered verbatim from `public/vendor/strudel/`.
 
 ## Quick start
 
 ```bash
-git clone --recurse-submodules git@github.com:toxicwind/strudel-dev-vite.git
-cd strudel-dev-vite
 npm install
-cp .env.example .env            # optional: customise bridge URLs
-npm run dev                     # launches the dev UI on http://localhost:8088
+npm run dev        # astro dev, serves http://127.0.0.1:4321/ by default
 ```
 
-Optional local sampler (serves audio metadata + dashboard):
-
-```bash
-# in a second terminal
-PORT=5432 npm run sampler     # uses apps/sampler via tsx
-```
-
-The sampler looks for audio files under `./samples/` by default (ignored by git). Copy your library there or set `STRUDEL_SAMPLES` in `.env` or the shell environment.
-
-> ℹ️ If you cloned without submodules, run `git submodule update --init --recursive` once to fetch `apps/sampler`.
-
-The repository ships with an empty `samples/.gitkeep` placeholder so the directory exists locally while staying out of version control. Drop your actual libraries alongside it or point `STRUDEL_SAMPLES` to another location.
+Astro copies everything in `public/` straight through to the build output, so the REPL bundle ships exactly as it was produced upstream.
 
 ## Scripts
 
 | Command | Description |
 | --- | --- |
-| `npm run dev` | Start the Strudel dev UI (Vite). |
-| `npm run build` | Build plugins + dev bundle for production. |
-| `npm run test` / `npm run test:e2e` | Headless Playwright smoke test (no Serum bridge dependency). |
-| `npm run sampler` | Launch sampler microservice with `tsx`. |
-| `npm run sampler:dev` | Run sampler in Vite middleware mode (useful for dashboard tweaks). |
-| `npm run sampler:build` | TypeScript build that emits `apps/sampler/dist`. |
-| `npm run clean` | Remove build and dependency artifacts. |
+| `npm run dev` | Launch Astro dev server. |
+| `npm run build` | Build static site (only `/`). |
+| `npm run preview` | Serve the latest `dist/` build. |
+| `npm run test:e2e` | Build then run Playwright smoke against `astro preview`. |
+| `npm run check` | `astro check` type analysis. |
 
-## Testing & quality
+All web entry points flow through Astro; there is no Vite/Tailwind/PostCSS/DaisyUI tooling in this repo any longer.
 
-- Playwright test ensures plugins register and emit Strudel events even when the Serum bridge is offline.
-- TypeScript is strict across workspaces; sampler microservice compiles to `dist/`.
+## Vendored Strudel bundles
 
-Run everything:
+The Strudel source of truth lives in `vendor/strudel` (cloned from Codeberg, commit `8f24ce223fff1411b0dcb433124092bad9bc1ab4`). The REPL web component was built with:
 
 ```bash
-npm run build
-npm run test
+cd vendor/strudel
+pnpm install
+pnpm --filter @strudel/repl build
 ```
 
-## Sampler microservice
+Artifacts were copied into `public/vendor/strudel/repl/` together with `doc.json`. Integrity hashes, byte sizes, build command, and upstream provenance live in `ops/pins/strudel-repl.json`. When upstream ships a new REPL release, rebuild from the vendored repo, refresh the assets, re-run the Playwright smoke, and update the pin file.
 
-The sampler service lives in the companion repo [`strudel-sampler-server-vite`](https://github.com/toxicwind/strudel-sampler-server-vite) and is vendored here as a git submodule. It keeps its production settings:
+### Tracking upstream vs fork
 
-- Config via `.env` or environment variables (`PORT`, `STRUDEL_SAMPLES`, `CACHE_TTL`, `CACHE_MAX_SIZE`, `HOT_RELOAD`).
-- Docker + Portainer deployment artifacts live in `apps/sampler/`.
-- Dashboard hosted at `http://localhost:<PORT>/dashboard/` once the service is running.
-
-To rebuild for production:
+The vendored repo keeps two remotes so pull requests flow through the maintained fork:
 
 ```bash
-npm run sampler:build
-node apps/sampler/dist/sampler-server.js
+cd vendor/strudel
+git remote -v
+# origin   git@codeberg.org:toxicwind/strudel-fork.git (fetch/push)
+# upstream git@codeberg.org:uzu/strudel.git          (fetch/push)
+
+git fetch upstream
+git merge upstream/main
+git push origin HEAD
 ```
+
+The fork at <https://codeberg.org/toxicwind/strudel-fork> is the default push target, while `upstream` keeps the official `uzu/strudel` repository available for syncing.
+
+## Testing
+
+Playwright (`tests/e2e/strudel.spec.ts`) boots `astro preview`, hits `/`, and asserts:
+
+- The vendor bundle is requested successfully (`/vendor/strudel/repl/index.js`),
+- `<strudel-editor>` exposes its `editor` API,
+- The local `doc.json` responds with HTTP 200,
+- The rendered editor surface exceeds minimum width/height.
+
+Run it with:
+
+```bash
+npm run test:e2e
+```
+
+Reports land in `playwright-report/` and per-test assets in `test-results/`.
 
 ## Project layout
 
 ```
-apps/
-  dev/        # Vite front-end
-  sampler/    # Sampler microservice + middleware
-packages/
-  plugins/    # Strudel plugin helpers (Serum, filters, etc.)
-tests/e2e/    # Playwright smoke coverage
-samples/      # (ignored) drop your audio library here
+public/vendor/strudel/    # Vendored REPL dist + doc.json (served as-is by Astro)
+src/layouts/              # Base Astro layout (dark shell, script includes)
+src/pages/                # / (single page) mounting <strudel-editor>
+ops/checklist.migration.json
+ops/pins/                 # Provenance + integrity metadata for vendored assets
+vendor/strudel/           # Full upstream Strudel monorepo (Codeberg clone)
 ```
 
-## Environment
+## License
 
-- Copy `.env.example` to `.env` to override defaults. Available settings:
-  - `VITE_SERUM_BRIDGE_URL` – websocket used by the dev UI (defaults to `ws://localhost:9000`).
-- `VITE_SAMPLER_BASE_URL` – base URL for the sampler microservice (defaults to `http://localhost:5432`).
-- Sampler-specific variables live in the submodule (`apps/sampler/.env.example`) and include `STRUDEL_SAMPLES`, `PORT`, `CACHE_TTL`, and `CACHE_MAX_SIZE`.
-
-## Sample library tips
-
-- Follow Strudel's folder conventions so subdirectories become available as sample names (for example `samples/drums/bd`, `samples/drums/sd`, `samples/fx/risers`). This lets you call them with the usual shorthand such as `s("bd sd")` or `samples('http://localhost:5432/').`  
-- Group drum kits and sound families together for predictable `bank` switching (e.g. `samples/drums/roland-tr-909/bd/*.wav`) and park multi-sampled instruments under a single prefix like `samples/keys/wurlitzer/`.  
-- Run the sampler dashboard (`http://localhost:5432/dashboard/`) after adding new files to confirm metadata, categories, and waveform previews before a session.
-
-## Continuous Integration
-
-GitHub Actions (`.github/workflows/ci.yml`) runs on every push and pull request:
-
-1. Checks out submodules.
-2. Executes `npm ci` and installs Playwright browsers.
-3. Runs `npm run build`, `npm run test:e2e`, and `npm run sampler:build`.
-4. Builds the Docker image to make sure the container workflow stays healthy.
-
-When the workflow is green, the dev UI, plugin bundle, sampler microservice, and Docker image have all built successfully from the committed lockfile.
-
-## Docker
-
-Use the included multi-stage `Dockerfile` to compile and serve the workspace via `vite preview`:
-
-```bash
-docker build -t strudel-dev-vite .
-docker run --rm -p 8088:8088 strudel-dev-vite
-```
-
-Supply environment overrides with `--env-file` (or `-e`) when you need a non-default bridge URL:
-
-```bash
-docker run --rm -p 8088:8088 --env-file .env strudel-dev-vite
-```
-
-For sampler containers, work directly inside [`strudel-sampler-server-vite`](https://github.com/toxicwind/strudel-sampler-server-vite) or mount the submodule into your runtime image.
-
-## Notes
-
-- `.gitignore` protects `samples/`, local env files (but keeps the `*.example` templates), Playwright output, and build artifacts.
-- `apps/dev` exposes plugin metadata on `window.__serumPlugins` for diagnostics and testing.
-- Serum bridge initialisation now degrades gracefully when no WebSocket server is available.
-- Sampler source is provided by [`strudel-sampler-server-vite`](https://github.com/toxicwind/strudel-sampler-server-vite) via git submodule; keep it in sync with `git submodule update --remote --merge` when you need upstream changes.
+This project ships under the [Do What The Fuck You Want To Public License](./LICENSE).

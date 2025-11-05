@@ -1,0 +1,165 @@
+{
+  "meta": {
+    "createdAt": "2025-11-04T23:04:49.872Z",
+    "branch": "unknown",
+    "description": "Astro + Strudel REPL migration per user instructions"
+  },
+  "tasks": [
+    {
+      "id": "CP1",
+      "title": "Halt & Observe",
+      "status": "done",
+      "evidence": [
+        "ops/evidence/postcss-error.txt",
+        "ops/evidence/playwright-timeout.txt",
+        "ops/evidence/open-ports.txt"
+      ],
+      "notes": "Stopped dev servers and captured original failure signals."
+    },
+    {
+      "id": "CP2",
+      "title": "Ledger Online",
+      "status": "done",
+      "evidence": [
+        "ops/checklist.migration.json"
+      ],
+      "notes": "Checklist initialized with tasks, decisions, risks."
+    },
+    {
+      "id": "CP3",
+      "title": "Promote Astro",
+      "status": "done",
+      "evidence": [
+        "astro.config.mjs",
+        "src/pages/index.astro",
+        "dist/index.html"
+      ],
+      "notes": "Astro configured as sole orchestrator; build succeeds."
+    },
+    {
+      "id": "CP4",
+      "title": "Vendor Source Resolution",
+      "status": "done",
+      "evidence": [
+        "ops/evidence/npm-strudel-repl-error.txt",
+        "vendor/strudel/packages/repl/dist/index.js",
+        "ops/evidence/vendor-repl-dist.txt",
+        "ops/evidence/vendor-strudel-sha256.txt"
+      ],
+      "notes": "Cloned Strudel from Codeberg and built @strudel/repl dist (commit 8f24ce223fff1411b0dcb433124092bad9bc1ab4)."
+    },
+    {
+      "id": "CP5",
+      "title": "Asset Ingress",
+      "status": "done",
+      "evidence": [
+        "public/vendor/strudel/repl/index.js",
+        "public/vendor/strudel/doc.json",
+        "ops/evidence/vendor-strudel-root.txt",
+        "ops/evidence/vendor-strudel-sha256.txt"
+      ],
+      "notes": "Vendored REPL dist + doc.json into public/vendor/strudel."
+    },
+    {
+      "id": "CP6",
+      "title": "UI Surface = REPL",
+      "status": "done",
+      "evidence": [
+        "src/pages/index.astro",
+        "src/layouts/ReplLayout.astro",
+        "ops/evidence/cp6-dist-snippet.txt"
+      ],
+      "notes": "Astro home route renders <strudel-editor> only; layout loads vendored REPL bundle."
+    },
+    {
+      "id": "CP7",
+      "title": "Explode Old Pipeline",
+      "status": "done",
+      "evidence": [
+        "package.json",
+        "ops/evidence/no-tailwind-scan.txt"
+      ],
+      "notes": "Removed Vite/Tailwind/PostCSS/DaisyUI deps and verified no references in src/public/tests/README."
+    },
+    {
+      "id": "CP8",
+      "title": "Node-Modules Autopsy",
+      "status": "done",
+      "evidence": [
+        "ops/evidence/cp8-node-modules.txt",
+        "ops/evidence/cp8-supradough.txt",
+        "ops/evidence/cp8-supradough-snippet.txt",
+        "ops/evidence/cp8-supradough-import.txt"
+      ],
+      "notes": "Confirmed no @strudel packages under node_modules and documented supradough references limited to bundled files."
+    },
+    {
+      "id": "CP9",
+      "title": "Test Orchestration",
+      "status": "done",
+      "evidence": [
+        "playwright.config.ts",
+        "tests/e2e/strudel.spec.ts",
+        "ops/evidence/playwright-smoke.log"
+      ],
+      "notes": "Playwright targets astro preview, verifies vendor asset + editor API; smoke passes."
+    },
+    {
+      "id": "CP10",
+      "title": "Provenance & Pins",
+      "status": "done",
+      "evidence": [
+        "ops/pins/strudel-repl.json"
+      ],
+      "notes": "Documented commit, build command, hashes, byte sizes for vendored REPL bundle."
+    },
+    {
+      "id": "CP11",
+      "title": "Docs Reality Map",
+      "status": "done",
+      "evidence": [
+        "README.md"
+      ],
+      "notes": "README now reflects Astro-only workflow, vendored assets, and smoke coverage."
+    },
+    {
+      "id": "CP12",
+      "title": "Close the Loop",
+      "status": "done",
+      "evidence": [
+        "apex-checklist.json",
+        "ops/evidence/playwright-smoke.log",
+        "ops/pins/strudel-repl.json"
+      ],
+      "notes": "All checkpoints completed; evidence captured; ledger + apex checklist updated."
+    }
+  ],
+  "decisions": [
+    {
+      "id": "D1",
+      "description": "Astro-only orchestrator with vendored REPL",
+      "confidence": 0.86,
+      "status": "accepted"
+    },
+    {
+      "id": "D2",
+      "description": "Remove Tailwind/PostCSS/DaisyUI toolchain",
+      "confidence": 0.9,
+      "status": "accepted"
+    }
+  ],
+  "risks": [
+    {
+      "id": "R1",
+      "description": "Vendor drift between pinned REPL dist and upstream Codeberg repo",
+      "status": "identified",
+      "mitigation": "Pin commit hash and schedule periodic refresh check"
+    }
+  ],
+  "evidence": [
+    {
+      "label": "dist/index.html",
+      "timestamp": "2025-11-04T23:05:12.623Z"
+    }
+  ]
+}
