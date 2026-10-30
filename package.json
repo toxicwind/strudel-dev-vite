@@ -21,6 +21,8 @@
     "sampler:build": "npm run build --workspace strudel-sampler-microservice"
   },
   "devDependencies": {
+    "@types/bun": "^1.4.4",
+    "bun-types": "^1.4.4",
     "@playwright/test": "^1.56.1",
     "@types/node": "^24.10.0",
     "@vitejs/plugin-react": "^4.3.1",
