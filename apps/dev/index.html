@@ -7,11 +7,19 @@
 </head>
 <body>
 <strudel-editor>
+samples('http://localhost:55432')
 setcps(0.5)
 voice('basic-lead')
   .note('<c3 eb3 g3 bb3>*4')
   .wavetable(0.3)
   .filterCutoff(1200)
+
+// sample-bank livecoding against fathom/samples/strudel-root
+// stack(
+//   s("pluck*8").note("<c4 eb4 g4>"),
+//   s("bass:0").every(4, fast(2)),
+//   s("kick*4"),
+// )
 </strudel-editor>
 <script type="module" src="/src/main.ts"></script>
 <script src="https://unpkg.com/@strudel/repl@latest?module"></script>
