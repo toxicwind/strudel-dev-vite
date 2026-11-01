@@ -1,6 +1,32 @@
 # strudel-dev-vite
 
-**Your Strudel live-coding workbench — a hot-reloading Vite dev UI, a reusable plugin kit with Serum-bridge wiring, and a production sampler microservice, one `npm install` apart.**
+**A Strudel live-coding workbench as a public npm-workspace monorepo**: a
+hot-reloading Vite REPL UI (`apps/dev`), a publishable Serum-voice plugin
+(`@toxicwind/strudel-serum`), and a sample-server microservice
+(`apps/sampler`, submodule).
+
+## Packages
+
+| Path | Package | Role |
+|------|---------|------|
+| `packages/serum` | **`@toxicwind/strudel-serum`** | Serum-style voice/filter pattern functions + WebSocket bridge, published to npm (`npm run publish:serum`, auto-on `serum@*` tag via CI) |
+| `apps/dev` | strudel-vite workbench | `<strudel-editor>` REPL running `@strudel/repl`, hot-reload on `:8088` |
+| `apps/sampler` | sampler submodule | serves `samples/` to the REPL via `samples('http://localhost:55432')` |
+
+## Clone (submodules need HTTPS, not `git@`)
+
+```bash
+git clone https://github.com/toxicwind/strudel-dev-vite.git
+cd strudel-dev-vite
+git submodule update --init --recursive
+npm install
+npm run dev           # REPL workbench on :8088
+```
+
+An unrelated Git history note: this repo is NOT a fork of upstream
+`uzu/strudel` (Codeberg) — it adopts the strudel ecosystem/`@strudel/*` packages
+as dependencies rather than sharing ancestry, so integration is npm-based, not a
+`git merge upstream`.
 
 [![CI](https://github.com/toxicwind/strudel-dev-vite/actions/workflows/ci.yml/badge.svg?style=for-the-badge)](https://github.com/toxicwind/strudel-dev-vite/actions)
 ![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=node.js&logoColor=white)
