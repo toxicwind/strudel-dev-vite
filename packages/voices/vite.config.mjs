@@ -6,7 +6,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   plugins: [dts()],
   build: {
-    lib: { entry: path.resolve(__dirname, 'src/index.ts'), name: 'SerumPlugins', formats: ['es'], fileName: 'index' },
+    lib: { entry: path.resolve(__dirname, 'src/index.ts'), name: 'VoicePlugins', formats: ['es'], fileName: 'index' },
     rollupOptions: { external: ['@strudel/core', '@strudel/web'] },
     target: 'esnext',
     outDir: 'dist',

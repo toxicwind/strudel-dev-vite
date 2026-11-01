@@ -10,7 +10,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "baseUrl": ".",
-    "paths": { "@custom/plugins": ["./packages/plugins/src"] },
+    "paths": { "@toxicwind/strudel-voices": ["./packages/voices/src"] },
     "types": ["vite/client", "@types/node", "@playwright/test"]
   },
   "include": ["**/*.ts","**/*.tsx"],

@@ -1,9 +1,14 @@
-import * as plugins from '@toxicwind/strudel-serum'
+import * as plugins from '@toxicwind/strudel-voices'
 
-if (typeof window !== 'undefined') {
-  ;(window as any).__serumPlugins = plugins
-  ;(window as any).__serumPluginKeys = Object.keys(plugins)
+const win = window as unknown as {
+  __voicePlugins: typeof plugins
+  __voicePluginKeys: string[]
 }
 
-console.log('Serum plugins loaded:', Object.keys(plugins))
+if (typeof window !== 'undefined') {
+  win.__voicePlugins = plugins
+  win.__voicePluginKeys = Object.keys(plugins)
+}
+
+console.log('Strudel voices loaded:', Object.keys(plugins))
 import('./init-bridge.js')

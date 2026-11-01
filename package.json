@@ -9,9 +9,9 @@
   ],
   "scripts": {
     "dev": "vite --config apps/dev/vite.config.mjs --host",
-    "build": "npm run build:serum && vite build --config apps/dev/vite.config.mjs",
-    "build:serum": "npm run build --workspace @toxicwind/strudel-serum",
-    "publish:serum": "npm publish --workspace @toxicwind/strudel-serum",
+    "build": "npm run build:voices && vite build --config apps/dev/vite.config.mjs",
+    "build:voices": "npm run build --workspace @toxicwind/strudel-voices",
+    "publish:voices": "npm publish --workspace @toxicwind/strudel-voices",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist node_modules packages/*/dist",
     "test": "npm run test:e2e",

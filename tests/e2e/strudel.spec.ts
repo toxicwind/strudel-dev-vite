@@ -1,32 +1,36 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Strudel dev UI', () => {
-  test('exposes plugins without depending on Serum bridge connectivity', async ({ page }) => {
+  test('exposes plugins without depending on bridge connectivity', async ({ page }) => {
     const [pluginLog] = await Promise.all([
       page.waitForEvent('console', {
-        predicate: (msg) => msg.type() === 'log' && msg.text().startsWith('Serum plugins loaded')
+        predicate: (msg) => msg.type() === 'log' && msg.text().startsWith('Strudel voices loaded')
       }),
       page.goto('/')
     ])
 
-    expect(pluginLog.text()).toContain('serum')
+    expect(pluginLog.text()).toContain('voice')
 
     const state = await page.evaluate(() => {
-      const globalThisAny = globalThis as any
-      const { __serumPluginKeys, __serumPlugins } = globalThisAny
+      const globalThisAny = globalThis as {
+        __voicePluginKeys: string[]
+        __voicePlugins: Record<string, (...args: unknown[]) => unknown>
+        voiceBridge?: WebSocket | unknown
+      }
+      const { __voicePluginKeys, __voicePlugins } = globalThisAny
       const steps: string[] = []
       const messages: string[] = []
-      if (__serumPlugins?.serum) {
+      if (__voicePlugins?.voice) {
         const stubBridge = {
-          readyState: globalThisAny.WebSocket?.OPEN ?? 1,
+          readyState: (globalThis as unknown as { WebSocket?: { OPEN: number } }).WebSocket?.OPEN ?? 1,
           sent: messages,
           send(payload: string) {
             this.sent.push(payload)
-          }
+          } as (payload: string) => void
         }
-        globalThisAny.serumBridge = stubBridge
+        globalThisAny.voiceBridge = stubBridge
 
-        const pattern: any = {
+        const pattern = {
           s(value: unknown) {
             steps.push(`s:${String(value)}`)
             return this
@@ -47,7 +51,7 @@ test.describe('Strudel dev UI', () => {
             steps.push(`gain:${String(value)}`)
             return this
           },
-          onTrigger(fn: (payload: any) => void) {
+          onTrigger(fn: (payload: { value: number }) => void) {
             steps.push('onTrigger')
             fn({ value: 64 })
             return this
@@ -65,18 +69,19 @@ test.describe('Strudel dev UI', () => {
             return this
           }
         }
-        __serumPlugins.serum('bass-pluck')(pattern)
+        const voice = __voicePlugins.voice as (name: string) => (pat: typeof pattern) => void
+        voice('bass-pluck')(pattern)
       }
       return {
-        pluginKeys: __serumPluginKeys,
-        hasSerum: Boolean(__serumPlugins?.serum),
+        pluginKeys: __voicePluginKeys,
+        hasVoice: Boolean(__voicePlugins?.voice),
         steps,
         messages
       }
     })
 
-    expect(state.pluginKeys).toContain('serum')
-    expect(state.hasSerum).toBe(true)
+    expect(state.pluginKeys).toContain('voice')
+    expect(state.hasVoice).toBe(true)
     expect(state.steps).toEqual([
       's:triangle',
       'lpf:800',

@@ -1,7 +1,7 @@
 {
-  "name": "@toxicwind/strudel-serum",
+  "name": "@toxicwind/strudel-voices",
   "version": "0.1.0",
-  "description": "Serum-style voice/filter pattern functions + WebSocket bridge for Strudel \u2014 wavetable, filterCutoff/filterRes, unison, detune.",
+  "description": "Voice/filter pattern functions + WebSocket bridge for Strudel \u2014 wavetable, filterCutoff/filterRes, unison, detune.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -26,7 +26,7 @@
     "strudel",
     "tidalcycles",
     "livecoding",
-    "serum",
+    "voice",
     "synthesizer",
     "algorave",
     "pattern"
