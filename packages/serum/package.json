@@ -1,14 +1,19 @@
 {
   "name": "@toxicwind/strudel-serum",
   "version": "0.1.0",
-  "description": "Serum-style voice/filter pattern functions + WebSocket bridge for Strudel — wavetable, filterCutoff/filterRes, unison, detune.",
+  "description": "Serum-style voice/filter pattern functions + WebSocket bridge for Strudel \u2014 wavetable, filterCutoff/filterRes, unison, detune.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "import": "./dist/index.js", "types": "./dist/index.d.ts" }
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
@@ -17,8 +22,15 @@
     "build": "vite build",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["strudel", "tidalcycles", "livecoding", "serum", "synthesizer", "algorave", "pattern"],
-  "license": "AGPL-3.0-or-later",
+  "keywords": [
+    "strudel",
+    "tidalcycles",
+    "livecoding",
+    "serum",
+    "synthesizer",
+    "algorave",
+    "pattern"
+  ],
   "dependencies": {
     "@strudel/core": "^1.2.0",
     "@strudel/web": "^1.2.0",

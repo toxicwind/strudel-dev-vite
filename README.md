@@ -1,155 +1,88 @@
-# strudel-dev-vite
+# @toxicwind/strudel-serum — Serum-style voices for Strudel
 
-**A Strudel live-coding workbench as a public npm-workspace monorepo**: a
-hot-reloading Vite REPL UI (`apps/dev`), a publishable Serum-voice plugin
-(`@toxicwind/strudel-serum`), and a sample-server microservice
-(`apps/sampler`, submodule).
+An npm-workspace monorepo that publishes **`@toxicwind/strudel-serum`** — a small set of
+pattern functions (Serum-style voice presets, wavetable, filter, unison, detune) plus an
+optional WebSocket bridge — for use inside any [Strudel](https://strudel.cc) livecoding
+project. Ships a hot-reloading Vite REPL workbench (`apps/dev`) and a sample-server
+submodule (`apps/sampler`).
 
 ## Packages
 
-| Path | Package | Role |
-|------|---------|------|
-| `packages/serum` | **`@toxicwind/strudel-serum`** | Serum-style voice/filter pattern functions + WebSocket bridge, published to npm (`npm run publish:serum`, auto-on `serum@*` tag via CI) |
-| `apps/dev` | strudel-vite workbench | `<strudel-editor>` REPL running `@strudel/repl`, hot-reload on `:8088` |
-| `apps/sampler` | sampler submodule | serves `samples/` to the REPL via `samples('http://localhost:55432')` |
+| Path | npm package | Role |
+|------|------------|------|
+| `packages/serum` | **`@toxicwind/strudel-serum`** | publishable plugin: voice/filter pattern functions + bridge |
+| `apps/dev` | — | Vite + React REPL workbench on `:8088` running `@strudel/repl` with the serum plugin loaded |
+| `apps/sampler` | `strudel-sampler-microservice` (submodule) | this repo's config of the sample server (the `samples()` contract) |
 
-## Clone (submodules need HTTPS, not `git@`)
+## Install
 
 ```bash
-git clone https://github.com/toxicwind/strudel-dev-vite.git
+# use the plugin in any Strudel project
+npm install @toxicwind/strudel-serum
+```
+
+## Repo setup
+
+```bash
+git clone --recurse-submodules https://github.com/toxicwind/strudel-dev-vite.git
 cd strudel-dev-vite
-git submodule update --init --recursive
+git submodule update --init --recursive   # HTTPS URLs (.gitmodules) — no SSH key needed
 npm install
-npm run dev           # REPL workbench on :8088
 ```
 
-An unrelated Git history note: this repo is NOT a fork of upstream
-`uzu/strudel` (Codeberg) — it adopts the strudel ecosystem/`@strudel/*` packages
-as dependencies rather than sharing ancestry, so integration is npm-based, not a
-`git merge upstream`.
+## Usage
 
-[![CI](https://github.com/toxicwind/strudel-dev-vite/actions/workflows/ci.yml/badge.svg?style=for-the-badge)](https://github.com/toxicwind/strudel-dev-vite/actions)
-![Node.js](https://img.shields.io/badge/Node.js-20+-339933?style=for-the-badge&logo=node.js&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-5-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![Playwright](https://img.shields.io/badge/Tests-Playwright-45ba68?style=for-the-badge&logo=microsoft-playwright&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-ready-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+```js
+import { serum, wavetable, filterCutoff, filterRes, unison, detune } from '@toxicwind/strudel-serum'
 
-## Why this exists
-
-Strudel live-coding usually means juggling three things at once: a place to write patterns, somewhere to host your sample library, and the audio plumbing in between. **strudel-dev-vite** wires all three together — experiment with patterns in the browser, serve your samples from the bundled microservice, and share the plugin helpers across every project you build on top.
-
-Built for Strudel performers and tinkerers who want a fast local loop: edit, hear it, ship it.
-
-## Features
-
-- 🎛️ **Dev UI on `:8088`** — Vite + React 19 with hot reload; loaded plugins are exposed on `window.__serumPlugins` for console experimentation
-- 🔌 **Serum bridge wiring** — `initSerumBridge()` connects the UI to your audio engine over WebSocket, configurable via `VITE_SERUM_BRIDGE_URL`
-- 🥁 **Sampler microservice built in** — the production [`strudel-sampler-server-vite`](https://github.com/toxicwind/strudel-sampler-server-vite) repo is vendored as a git submodule and serves sample metadata plus a dashboard on `:5432`
-- 📦 **Plugin kit (`@custom/plugins`)** — reusable Strudel helpers (Serum, filter builders) built as a versioned library with type declarations
-- ✅ **Bridge-independent smoke test** — the Playwright suite proves plugins load and emit events with the Serum bridge fully offline
-- 🐳 **Docker multi-stage build** — ships the dev bundle on `:8088` with the compiled sampler alongside
-- 🧪 **CI on every push and PR** — workspace build, Playwright suite, sampler build, and a Docker build, all green or it doesn't land
-
-## How it fits together
-
-```mermaid
-graph LR
-    subgraph workspace["npm workspaces"]
-        dev["apps/dev<br/>Vite + React UI<br/>:8088"]
-        plugins["packages/plugins<br/>@custom/plugins<br/>Serum helpers"]
-        sampler["apps/sampler<br/>git submodule<br/>:5432"]
-    end
-    dev -->|imports| plugins
-    dev -->|VITE_SERUM_BRIDGE_URL<br/>ws://localhost:9000| bridge["Serum bridge<br/>(your audio engine)"]
-    dev -->|sample URLs| sampler
-    sampler --> samples[("samples/<br/>audio library")]
-    sampler -->|/dashboard| dash["sampler dashboard"]
-    you(["you, live-coding"]) -->|patterns| dev
+// compose a Serum-style voice pattern
+serum('basic-lead')
+  .note('<c3 eb3 g3 bb3>*4')
+  .wavetable(0.3)
+  .filterCutoff(1200)
 ```
 
-## Quick start
+Exports (from `packages/serum/src/serum.ts`):
+- `serum(voiceName)` — voice presets (`basic-lead`, `bass-pluck`, `pad`)
+- `wavetable`, `filterCutoff`, `filterRes`, `unison`, `detune` — pattern transformers
+- `initSerumBridge(url)` — optional WebSocket bridge (`ws://localhost:9000` default)
+
+## Dev workbench (`apps/dev`)
+
+The Vite REPL UI loads the serum plugin (via `@toxicwind/strudel-serum` alias) and exposes
+it on `window.__serumPlugins` / `window.__serumPluginKeys`, then calls `initSerumBridge()`.
+Run it with the sampler to livecode against your sample library:
 
 ```bash
-git clone --recurse-submodules git@github.com:toxicwind/strudel-dev-vite.git && cd strudel-dev-vite
-npm install
-npm run dev
+npm run dev   # :8088 — REPL workbench
 ```
 
-Open <http://localhost:8088> and start patterning. In a second terminal, serve your sample library:
+See the sampler repo (`toxicwind/strudel-sampler-server-vite`) for serving audio via
+`samples('http://localhost:<port>')`.
 
-```bash
-PORT=5432 npm run sampler
-```
+## Scripts
 
-> If you cloned without `--recurse-submodules`, run `git submodule update --init --recursive` once to fetch `apps/sampler`. The repo ships an empty `samples/` directory (git-ignored) — drop your audio library there or point `STRUDEL_SAMPLES` elsewhere.
+| Script | Does |
+|--------|------|
+| `npm run dev` | Vite hot-reload REPL on `:8088` |
+| `npm run build` | build `@toxicwind/strudel-serum` + bundle the workbench |
+| `npm run build:serum` | build only the serum package (`packages/serum/dist`) |
+| `npm run publish:serum` | `npm publish` `@toxicwind/strudel-serum` |
+| `npm run test` / `test:e2e` | Playwright suite (`tests/e2e/strudel.spec.ts`) |
+| `npm run sampler` / `sampler:dev` / `sampler:build` | run/build the sample-server submodule |
 
-## Architecture
+## CI
 
-| Path | What it is | Entry point |
-| --- | --- | --- |
-| `apps/dev/` | Browser shell: loads plugins, connects the Serum bridge | `apps/dev/src/main.ts`, `init-bridge.ts` |
-| `packages/plugins/` | Reusable Strudel plugin helpers (`@custom/plugins`) | `packages/plugins/src/index.ts` |
-| `apps/sampler/` | Sampler microservice + Vite middleware (submodule) | `apps/sampler/sampler-server.ts` |
-| `tests/e2e/` | Playwright smoke coverage | `tests/e2e/strudel.spec.ts` |
-| `samples/` | Your audio library (git-ignored, never committed) | — |
+`.github/workflows/ci.yml` builds the workspace, runs Playwright, builds the sampler, and
+Docker-builds. A `publish` job publishes `@toxicwind/strudel-serum` to npm when a `serum@*`
+tag is pushed (token: `secrets.NPM_TOKEN`).
 
-The dev UI loads `@custom/plugins` and exposes them on `window.__serumPlugins` / `window.__serumPluginKeys`, then calls `initSerumBridge()` with the configured bridge URL. If the bridge is down, the UI still works — the smoke test covers exactly that case.
+## Samples
 
-## Configuration
+`/samples` is a working sample-library root (referenced-not-owned). The sample packs are
+downloadable assets, gitignored and not redistributed by this repo.
 
-Copy `.env.example` to `.env` to override defaults:
+## Relationship to upstream
 
-| Variable | Default | Used by |
-| --- | --- | --- |
-| `VITE_SERUM_BRIDGE_URL` | `ws://localhost:9000` | Dev UI → Serum bridge WebSocket |
-| `STRUDEL_SAMPLER_URL` | `http://localhost:5432/strudel-samples` | Scripts/tests pointing at a sampler |
-
-Sampler-specific variables live in the submodule (`apps/sampler/.env.example`):
-
-| Variable | Default | Meaning |
-| --- | --- | --- |
-| `PORT` | `5432` | Sampler HTTP port (dashboard at `/dashboard`) |
-| `STRUDEL_SAMPLES` | `./samples` | Audio library root |
-| `CACHE_TTL` | `3600000` | Metadata cache TTL (ms) |
-| `CACHE_MAX_SIZE` | `500` | Metadata cache entries |
-| `HOT_RELOAD` | `true` | Pick up new samples without restart |
-
-## Development
-
-| Command | What it does |
-| --- | --- |
-| `npm run dev` | Start the Strudel dev UI (Vite, strict port `8088`) |
-| `npm run build` | Build plugins library + dev bundle for production |
-| `npm run type-check` | `tsc --noEmit` across all workspaces |
-| `npm run test` / `npm run test:e2e` | Headless Playwright smoke test (no bridge needed) |
-| `npm run sampler` | Launch the sampler microservice via `tsx` |
-| `npm run sampler:dev` | Sampler in Vite middleware mode (dashboard tweaks) |
-| `npm run sampler:build` | Compile the sampler to `apps/sampler/dist` |
-| `npm run preview` | Preview the production dev-bundle build |
-| `npm run clean` | Remove build and dependency artifacts |
-
-Full check before pushing:
-
-```bash
-npm run build && npm run type-check && npm run test
-```
-
-Or ship the whole thing as a container:
-
-```bash
-docker build -t strudel-dev-vite .
-docker run -p 8088:8088 strudel-dev-vite
-```
-
-## Sample library tips
-
-- Follow Strudel's folder conventions so subdirectories become sample names (`samples/drums/bd`, `samples/fx/risers`) — then `s("bd sd")` just works.
-- Group drum kits and sound families for predictable `bank` switching (e.g. `samples/drums/roland-tr-909/bd/*.wav`); park multi-sampled instruments under one prefix like `samples/keys/wurlitzer/`.
-- After adding files, open the sampler dashboard (`http://localhost:5432/dashboard/`) to confirm metadata, categories, and waveform previews before a session.
-
-## License and security
-
-- **License:** no license file has been added yet — treat the contents as all-rights-reserved until one is.
-- **Security:** no secrets are committed to this repo. Local overrides belong in `.env` (git-ignored); `.env.example` documents the shape. Your audio in `samples/` never leaves your machine unless you deploy it yourself.
+This is an independent npm-package consumer of Strudel (via `@strudel/*`), not a fork of
+`uzu/strudel` — integration is npm-based, not a `git merge upstream`.
