@@ -1,4 +1,4 @@
-import * as plugins from '@custom/plugins'
+import * as plugins from '@toxicwind/strudel-serum'
 
 if (typeof window !== 'undefined') {
   ;(window as any).__serumPlugins = plugins

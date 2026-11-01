@@ -1,4 +1,4 @@
-import { initSerumBridge } from '@custom/plugins'
+import { initSerumBridge } from '@toxicwind/strudel-serum'
 
 const bridgeUrl =
   // Vite exposes environment variables prefixed with VITE_
