@@ -21,7 +21,7 @@ serum→strudel bridge.
   --coverage`). `npm run test:unit` added.
 - **Sampler**: upstream `@strudel/sampler` verified serving 40+ banks, 1300+
   samples on `:55432` (default `:5432` ghosted); rendered Serum bank added.
-- **Ports SSOT** (`pens/estate/config/ports.env`): `ABYSS_PORT=25261` +
+- **Ports SSOT** (`pens/Pens/config/ports.env`): `ABYSS_PORT=25261` +
   `STRUDEL_SAMPLER_PORT=55432`.
 
 ### Prior history (pre-monorepo)
