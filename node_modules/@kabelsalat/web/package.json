@@ -1,0 +1,20 @@
+{
+  "name": "@kabelsalat/web",
+  "version": "0.4.1",
+  "type": "module",
+  "module": "dist/index.mjs",
+  "main": "dist/index.js",
+  "author": "Felix Roos <flix91@gmail.com>",
+  "license": "AGPL-3.0-or-later",
+  "dependencies": {
+    "@kabelsalat/core": "0.4.0",
+    "@kabelsalat/lib": "0.4.1"
+  },
+  "devDependencies": {
+    "vite": "^5.2.0",
+    "vite-plugin-bundle-audioworklet": "0.1.1"
+  },
+  "scripts": {
+    "build": "vite build"
+  }
+}
